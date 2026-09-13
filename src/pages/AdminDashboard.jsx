@@ -155,7 +155,8 @@ const AdminDashboard = () => {
   // Stats calculation
   const totalProducts = products.length;
   const totalValue = products.reduce((sum, p) => sum + Number(p.price || 0), 0);
-  const uniqueCategories = new Set(products.map(p => p.category)).size;
+  const uniqueCategoryList = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+  const uniqueCategoriesCount = uniqueCategoryList.length;
 
   return (
     <div className="dashboard-container">
@@ -261,13 +262,20 @@ const AdminDashboard = () => {
                       </div>
                       <div className="form-group">
                         <label>Category</label>
-                        <select name="category" value={formData.category} onChange={handleInputChange} required>
-                          <option value="">Select Category</option>
-                          <option value="software">Software</option>
-                          <option value="design">Design Assets</option>
-                          <option value="course">Courses</option>
-                          <option value="other">Other</option>
-                        </select>
+                        <input 
+                          type="text" 
+                          name="category" 
+                          value={formData.category} 
+                          onChange={handleInputChange} 
+                          list="category-options" 
+                          placeholder="Select or type new category" 
+                          required 
+                        />
+                        <datalist id="category-options">
+                          {uniqueCategoryList.map(cat => (
+                            <option key={cat} value={cat} />
+                          ))}
+                        </datalist>
                       </div>
                     </div>
                   </div>
@@ -359,7 +367,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="stat-card">
                   <h3>Categories</h3>
-                  <div className="stat-value">{isLoading ? '...' : uniqueCategories}</div>
+                  <div className="stat-value">{isLoading ? '...' : uniqueCategoriesCount}</div>
                 </div>
               </div>
             </div>
