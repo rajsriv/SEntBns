@@ -68,7 +68,6 @@ const AdminLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <a href="#" className="forgot-password">Forgot password?</a>
             </div>
 
             <button type="submit" className="admin-login-btn-solid" disabled={isLoading}>

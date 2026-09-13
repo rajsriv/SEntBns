@@ -5,7 +5,7 @@ import './Navbar.css';
 const Navbar = ({ isDarkMode, toggleTheme }) => {
   return (
     <header className="navbar">
-      <div className="container navbar-content">
+      <div className="navbar-content">
         <Link to="/" className="brand">
           Shivay <span>Enterprises</span>
         </Link>
