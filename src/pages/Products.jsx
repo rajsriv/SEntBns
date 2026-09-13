@@ -4,15 +4,6 @@ import ProductCard from '../components/ProductCard';
 import { Filter, X } from 'lucide-react';
 import './Products.css';
 
-// Placeholder data
-const PLACEHOLDER_PRODUCTS = [
-  { id: 1, name: 'Ergonomic Office Chair', category: 'Furniture', brand: 'ComfortPlus', price: 8500, image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=400&q=80', gemLink: 'https://gem.gov.in/' },
-  { id: 2, name: 'Executive Desk', category: 'Furniture', brand: 'WoodCraft', price: 15000, image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=400&q=80', gemLink: 'https://gem.gov.in/' },
-  { id: 3, name: 'A4 Printer Paper (Box)', category: 'Stationery', brand: 'PrintMax', price: 1200, image: 'https://images.unsplash.com/photo-1588626573867-a2f64fcb9538?auto=format&fit=crop&w=400&q=80', gemLink: 'https://gem.gov.in/' },
-  { id: 4, name: 'Laser Printer Pro', category: 'Electronics', brand: 'TechPrint', price: 22000, image: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=400&q=80', gemLink: 'https://gem.gov.in/' },
-  { id: 5, name: 'Conference Table', category: 'Furniture', brand: 'WoodCraft', price: 35000, image: 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=400&q=80', gemLink: 'https://gem.gov.in/' },
-  { id: 6, name: 'Whiteboard 6x4', category: 'Office Supplies', brand: 'EduBoard', price: 4500, image: 'https://images.unsplash.com/photo-1577563908411-50cb98976fea?auto=format&fit=crop&w=400&q=80', gemLink: 'https://gem.gov.in/' },
-];
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -72,15 +63,12 @@ const Products = () => {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    // If backend is empty, fall back to PLACEHOLDER_PRODUCTS for demo purposes
-    const dataToFilter = products.length > 0 ? products : PLACEHOLDER_PRODUCTS;
-    
-    return dataToFilter.filter((product) => {
+    return products.filter((product) => {
       const categoryMatch = selectedCategory === 'All' || product.category === selectedCategory;
       const brandMatch = selectedBrand === 'All' || product.brand === selectedBrand;
       return categoryMatch && brandMatch;
     });
-  }, [selectedCategory, selectedBrand]);
+  }, [products, selectedCategory, selectedBrand]);
 
   const toggleMobileFilter = () => setIsMobileFilterOpen(!isMobileFilterOpen);
 
