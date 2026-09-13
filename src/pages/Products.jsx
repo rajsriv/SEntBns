@@ -20,14 +20,15 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [isTopFilterVisible, setIsTopFilterVisible] = useState(true);
+  const [isStickyVisible, setIsStickyVisible] = useState(false);
   
   const topFilterRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsTopFilterVisible(entry.isIntersecting);
+        // Only show sticky filter if the anchor is out of view AND above the viewport
+        setIsStickyVisible(!entry.isIntersecting && entry.boundingClientRect.top < 0);
       },
       { threshold: 0 }
     );
@@ -107,7 +108,7 @@ const Products = () => {
         </div>
 
         {/* Mobile Filter Toggle (Sticky Bottom) */}
-        {!isTopFilterVisible && (
+        {isStickyVisible && (
           <button 
             className="btn btn-primary mobile-filter-sticky" 
             onClick={toggleMobileFilter}
