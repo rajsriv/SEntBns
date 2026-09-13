@@ -137,17 +137,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition: background 0.3s ease;
   margin-top: 1rem;
-}
-
-.admin-login-btn-solid:hover:not(:disabled) {
-  background: #1e293b;
-  transform: translateY(-1px);
-}
-
-.admin-login-btn-solid:active:not(:disabled) {
-  transform: translateY(0);
 }
 
 .admin-login-btn-solid:disabled {
@@ -158,9 +149,6 @@
 [data-theme='dark'] .admin-login-btn-solid {
   background: #38bdf8;
   color: #0f172a;
-}
-[data-theme='dark'] .admin-login-btn-solid:hover:not(:disabled) {
-  background: #7dd3fc;
 }
 
 .admin-error-message {
