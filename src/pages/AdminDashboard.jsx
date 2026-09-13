@@ -6,6 +6,7 @@ import './AdminDashboard.css';
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('addProduct');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -29,6 +30,43 @@ const AdminDashboard = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      alert('You must be logged in to upload images.');
+      navigate('/admin/login');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append('image', file);
+
+    try {
+      const response = await fetch('https://sentbns.onrender.com/api/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formDataUpload
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setFormData(prev => ({ ...prev, imageUrl: data.imageUrl }));
+      } else {
+        alert(`Upload failed: ${data.error}`);
+      }
+    } catch (err) {
+      alert('Failed to connect to the server for image upload.');
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -185,16 +223,31 @@ const AdminDashboard = () => {
                   {/* Right Column */}
                   <div className="form-col">
                     <div className="form-group">
-                      <label>Image URL (Hosted on GitHub/Vercel)</label>
-                      <div className="input-with-icon">
-                        <ImageIcon size={18} className="field-icon" />
+                      <label>Product Image (Upload or Paste URL)</label>
+                      <div className="image-input-group" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          id="device-upload" 
+                          style={{ display: 'none' }}
+                          onChange={handleImageUpload}
+                          disabled={isUploadingImage}
+                        />
+                        <label 
+                          htmlFor="device-upload" 
+                          className="btn-secondary" 
+                          style={{ cursor: 'pointer', padding: '0.6rem 1rem', fontSize: '0.85rem', margin: 0, whiteSpace: 'nowrap' }}
+                        >
+                          {isUploadingImage ? 'Uploading...' : 'Upload Image'}
+                        </label>
                         <input 
                           type="url" 
                           name="imageUrl" 
                           value={formData.imageUrl} 
                           onChange={handleInputChange} 
-                          placeholder="https://..." 
+                          placeholder="Or paste URL here..." 
                           required 
+                          style={{ flex: 1, margin: 0 }}
                         />
                       </div>
                       {/* Image Preview */}

@@ -3,13 +3,31 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
-
+const multer = require('multer');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 dotenv.config();
 
 const Product = require('./models/Product');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Cloudinary Config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'se-website-products',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp']
+  }
+});
+const upload = multer({ storage: storage });
 
 // Middleware
 app.use(cors());
@@ -64,7 +82,15 @@ app.post('/api/products', authenticateToken, async (req, res) => {
   }
 });
 
-// 3. Get All Products (Public)
+// 3. Upload Image (Protected)
+app.post('/api/upload', authenticateToken, upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No image file uploaded' });
+  }
+  res.json({ imageUrl: req.file.path });
+});
+
+// 4. Get All Products (Public)
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
