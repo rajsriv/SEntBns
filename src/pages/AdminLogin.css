@@ -3,14 +3,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: var(--bg-color);
   font-family: 'Inter', sans-serif;
   padding: 1rem;
 }
 
 .admin-login-card {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
   border-radius: 24px;
   padding: 3rem 2.5rem;
   width: 100%;
@@ -23,7 +23,7 @@
 
 .admin-login-header {
   text-align: center;
-  color: #f8fafc;
+  color: var(--text-color);
 }
 
 .admin-icon-wrapper {
@@ -50,7 +50,7 @@
 }
 
 .admin-login-header p {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
@@ -76,11 +76,11 @@
 
 .input-group input {
   width: 100%;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1rem 1rem 1rem 3rem;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1rem;
   outline: none;
   transition: all 0.3s ease;
@@ -92,7 +92,7 @@
 
 .input-group input:focus {
   border-color: #38bdf8;
-  background: #0f172a;
+  background: var(--bg-color);
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
 }
 
@@ -103,7 +103,7 @@
 
 .admin-login-btn {
   background: #38bdf8;
-  color: #0f172a;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   padding: 1rem;
@@ -147,9 +147,9 @@
 .loader {
   width: 24px;
   height: 24px;
-  border: 3px solid rgba(15, 23, 42, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #0f172a;
+  border-top-color: #ffffff;
   animation: spin 1s ease-in-out infinite;
 }
 

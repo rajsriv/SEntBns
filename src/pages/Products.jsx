@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { Filter, X } from 'lucide-react';
@@ -14,16 +14,47 @@ const PLACEHOLDER_PRODUCTS = [
   { id: 6, name: 'Whiteboard 6x4', category: 'Office Supplies', brand: 'EduBoard', price: 4500, image: 'https://images.unsplash.com/photo-1577563908411-50cb98976fea?auto=format&fit=crop&w=400&q=80', gemLink: 'https://gem.gov.in/' },
 ];
 
-const CATEGORIES = ['All', 'Furniture', 'Stationery', 'Electronics', 'Office Supplies'];
-const BRANDS = ['All', 'ComfortPlus', 'WoodCraft', 'PrintMax', 'TechPrint', 'EduBoard'];
-
 const Products = () => {
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('https://sentbns.onrender.com/api/products');
+        const data = await response.json();
+        if (response.ok) {
+          setProducts(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Get dynamic categories and brands from fetched data
+  const CATEGORIES = useMemo(() => {
+    const cats = new Set(products.map(p => p.category));
+    return ['All', ...Array.from(cats)];
+  }, [products]);
+
+  const BRANDS = useMemo(() => {
+    const brands = new Set(products.map(p => p.brand).filter(Boolean)); // Brand might not be in the new schema, filter out undefined
+    return ['All', ...Array.from(brands)];
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
-    return PLACEHOLDER_PRODUCTS.filter((product) => {
+    // If backend is empty, fall back to PLACEHOLDER_PRODUCTS for demo purposes
+    const dataToFilter = products.length > 0 ? products : PLACEHOLDER_PRODUCTS;
+    
+    return dataToFilter.filter((product) => {
       const categoryMatch = selectedCategory === 'All' || product.category === selectedCategory;
       const brandMatch = selectedBrand === 'All' || product.brand === selectedBrand;
       return categoryMatch && brandMatch;
@@ -99,10 +130,14 @@ const Products = () => {
             <span className="results-count">Showing {filteredProducts.length} result(s)</span>
           </div>
           
-          {filteredProducts.length > 0 ? (
+          {isLoading ? (
+            <div className="loading-state">
+              <p>Loading products...</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="products-grid">
               {filteredProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product._id || product.id} product={product} />
               ))}
             </div>
           ) : (
