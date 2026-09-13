@@ -127,10 +127,18 @@
 }
 
 /* Mobile Adjustments */
-.mobile-filter-toggle {
+.mobile-filter-anchor {
   display: none;
+  width: 100%;
+}
+
+.mobile-filter-toggle {
   margin-bottom: 1.5rem;
   width: 100%;
+}
+
+.mobile-filter-sticky {
+  display: none;
 }
 
 .mobile-only {
@@ -142,8 +150,23 @@
     flex-direction: column;
   }
 
-  .mobile-filter-toggle {
+  .mobile-filter-anchor {
+    display: block;
+  }
+
+  .mobile-filter-sticky {
     display: inline-flex;
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    box-shadow: var(--shadow-lg);
+    border-radius: 9999px; /* Pill shape */
+    padding: 0.75rem 2rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
   }
 
   .products-sidebar {

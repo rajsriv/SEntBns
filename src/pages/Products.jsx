@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { Filter, X } from 'lucide-react';
@@ -20,6 +20,26 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isTopFilterVisible, setIsTopFilterVisible] = useState(true);
+  
+  const topFilterRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsTopFilterVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    if (topFilterRef.current) {
+      observer.observe(topFilterRef.current);
+    }
+
+    return () => {
+      if (topFilterRef.current) observer.unobserve(topFilterRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -79,10 +99,22 @@ const Products = () => {
       </section>
 
       <div id="catalog" className="container products-layout">
-        {/* Mobile Filter Toggle */}
-        <button className="btn btn-outline mobile-filter-toggle" onClick={toggleMobileFilter}>
-          <Filter size={20} /> Filters
-        </button>
+        {/* Mobile Filter Toggle (Top) */}
+        <div ref={topFilterRef} className="mobile-filter-anchor">
+          <button className="btn btn-outline mobile-filter-toggle" onClick={toggleMobileFilter}>
+            <Filter size={20} /> Filters
+          </button>
+        </div>
+
+        {/* Mobile Filter Toggle (Sticky Bottom) */}
+        {!isTopFilterVisible && (
+          <button 
+            className="btn btn-primary mobile-filter-sticky" 
+            onClick={toggleMobileFilter}
+          >
+            <Filter size={20} /> Filters
+          </button>
+        )}
 
         {/* Sidebar */}
         <aside className={`products-sidebar ${isMobileFilterOpen ? 'open' : ''}`}>
