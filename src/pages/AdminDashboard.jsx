@@ -9,6 +9,7 @@ const AdminDashboard = () => {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
 
   // Fetch products on mount
   const fetchProducts = async () => {
@@ -123,6 +124,7 @@ const AdminDashboard = () => {
           category: '',
           buttonText: 'Buy Now'
         });
+        setIsAddingNewCategory(false);
         fetchProducts(); // Refresh list
       } else {
         alert(`Error: ${data.error}`);
@@ -262,20 +264,58 @@ const AdminDashboard = () => {
                       </div>
                       <div className="form-group">
                         <label>Category</label>
-                        <input 
-                          type="text" 
-                          name="category" 
-                          value={formData.category} 
-                          onChange={handleInputChange} 
-                          list="category-options" 
-                          placeholder="Select or type new category" 
-                          required 
-                        />
-                        <datalist id="category-options">
-                          {uniqueCategoryList.map(cat => (
-                            <option key={cat} value={cat} />
-                          ))}
-                        </datalist>
+                        {uniqueCategoryList.length > 0 && !isAddingNewCategory ? (
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <select 
+                              name="category" 
+                              value={formData.category} 
+                              onChange={handleInputChange} 
+                              required 
+                              style={{ flex: 1 }}
+                            >
+                              <option value="">Select Category</option>
+                              {uniqueCategoryList.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                              ))}
+                            </select>
+                            <button 
+                              type="button" 
+                              className="btn-secondary" 
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, category: '' }));
+                                setIsAddingNewCategory(true);
+                              }}
+                              style={{ padding: '0 1rem' }}
+                            >
+                              New
+                            </button>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input 
+                              type="text" 
+                              name="category" 
+                              value={formData.category} 
+                              onChange={handleInputChange} 
+                              placeholder="Type new category..." 
+                              required 
+                              style={{ flex: 1 }}
+                            />
+                            {uniqueCategoryList.length > 0 && (
+                              <button 
+                                type="button" 
+                                className="btn-secondary" 
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, category: '' }));
+                                  setIsAddingNewCategory(false);
+                                }}
+                                style={{ padding: '0 1rem' }}
+                              >
+                                Cancel
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
