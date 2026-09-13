@@ -169,6 +169,11 @@
     border: none;
   }
 
+  .mobile-filter-sticky:hover,
+  .mobile-filter-sticky:active {
+    transform: translateX(-50%) !important;
+  }
+
   .products-sidebar {
     position: fixed;
     top: 0;
