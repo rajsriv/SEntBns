@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, User, LogIn } from 'lucide-react';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
@@ -40,51 +39,43 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="admin-login-container">
-      <div className="admin-login-card">
-        <div className="admin-login-header">
-          <div className="admin-icon-wrapper">
-            <Lock size={32} className="admin-icon" />
-          </div>
-          <h2>Admin Portal</h2>
-          <p>Secure access for site administrators</p>
+    <div className="admin-login-split-container">
+      <div className="admin-login-image-side">
+        <h1 className="welcome-text">WELCOME</h1>
+      </div>
+      
+      <div className="admin-login-form-side">
+        <div className="admin-login-form-wrapper">
+          <h2 className="login-heading">Login</h2>
+
+          {error && <div className="admin-error-message">{error}</div>}
+
+          <form onSubmit={handleLogin} className="admin-login-form">
+            <div className="input-group-minimal">
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group-minimal password-group">
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <a href="#" className="forgot-password">Forgot password?</a>
+            </div>
+
+            <button type="submit" className="admin-login-btn-solid" disabled={isLoading}>
+              {isLoading ? <span className="loader-dark"></span> : 'Login'}
+            </button>
+          </form>
         </div>
-
-        {error && <div className="admin-error-message">{error}</div>}
-
-        <form onSubmit={handleLogin} className="admin-login-form">
-          <div className="input-group">
-            <User className="input-icon" size={20} />
-            <input
-              type="email"
-              placeholder="Admin Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <Lock className="input-icon" size={20} />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button type="submit" className="admin-login-btn" disabled={isLoading}>
-            {isLoading ? (
-              <span className="loader"></span>
-            ) : (
-              <>
-                <span>Sign In</span>
-                <LogIn size={20} />
-              </>
-            )}
-          </button>
-        </form>
       </div>
     </div>
   );
