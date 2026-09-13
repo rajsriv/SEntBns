@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, PlusCircle, LayoutDashboard, Package, Settings, Image as ImageIcon } from 'lucide-react';
 import './AdminDashboard.css';
@@ -7,6 +7,27 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('addProduct');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch products on mount
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('https://sentbns.onrender.com/api/products');
+      const data = await response.json();
+      if (response.ok) {
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -102,6 +123,7 @@ const AdminDashboard = () => {
           category: '',
           buttonText: 'Buy Now'
         });
+        fetchProducts(); // Refresh list
       } else {
         alert(`Error: ${data.error}`);
       }
@@ -109,6 +131,31 @@ const AdminDashboard = () => {
       alert('Failed to connect to the server.');
     }
   };
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm('Are you sure you want to permanently delete this product?')) return;
+    
+    const token = localStorage.getItem('adminToken');
+    try {
+      const response = await fetch(`https://sentbns.onrender.com/api/products/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        setProducts(products.filter(p => p._id !== id));
+      } else {
+        const data = await response.json();
+        alert(`Failed to delete: ${data.error}`);
+      }
+    } catch (err) {
+      alert('Network error while deleting product.');
+    }
+  };
+
+  // Stats calculation
+  const totalProducts = products.length;
+  const totalValue = products.reduce((sum, p) => sum + Number(p.price || 0), 0);
+  const uniqueCategories = new Set(products.map(p => p.category)).size;
 
   return (
     <div className="dashboard-container">
@@ -158,7 +205,12 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <main className="dashboard-main">
         <header className="main-header">
-          <h1>{activeTab === 'addProduct' ? 'Add New Product' : 'Dashboard'}</h1>
+          <h1>
+            {activeTab === 'addProduct' && 'Add New Product'}
+            {activeTab === 'dashboard' && 'Dashboard Overview'}
+            {activeTab === 'manage' && 'Manage Products'}
+            {activeTab === 'settings' && 'Admin Settings'}
+          </h1>
           <div className="admin-profile">
             <span>Admin</span>
             <div className="profile-avatar">A</div>
@@ -294,10 +346,85 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activeTab !== 'addProduct' && (
-            <div className="placeholder-content">
-              <h3>Section Under Construction</h3>
-              <p>This area will be populated with data from the backend soon.</p>
+          {activeTab === 'dashboard' && (
+            <div className="overview-panel fade-in">
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <h3>Total Products</h3>
+                  <div className="stat-value">{isLoading ? '...' : totalProducts}</div>
+                </div>
+                <div className="stat-card">
+                  <h3>Total Catalog Value</h3>
+                  <div className="stat-value">{isLoading ? '...' : `₹${totalValue.toLocaleString()}`}</div>
+                </div>
+                <div className="stat-card">
+                  <h3>Categories</h3>
+                  <div className="stat-value">{isLoading ? '...' : uniqueCategories}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'manage' && (
+            <div className="manage-panel fade-in">
+              {isLoading ? (
+                <p>Loading products...</p>
+              ) : products.length === 0 ? (
+                <div className="placeholder-content">
+                  <h3>No Products Found</h3>
+                  <p>Add some products to see them listed here.</p>
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map(product => (
+                        <tr key={product._id}>
+                          <td>
+                            <img src={product.imageUrl || product.image} alt={product.title || product.name} className="table-img" />
+                          </td>
+                          <td className="table-title">{product.title || product.name}</td>
+                          <td><span className="badge">{product.category}</span></td>
+                          <td>₹{product.price}</td>
+                          <td>
+                            <button 
+                              className="btn-delete" 
+                              onClick={() => handleDeleteProduct(product._id)}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="settings-panel fade-in">
+              <div className="form-container">
+                <h3>Theme Settings</h3>
+                <p>You can toggle your site's global theme using the moon/sun icon in the top right corner of the navigation bar.</p>
+                <br />
+                <h3>Account Information</h3>
+                <div className="form-group" style={{maxWidth: '400px', marginTop: '1rem'}}>
+                  <label>Admin Email</label>
+                  <input type="text" value="admin@example.com" disabled />
+                  <small style={{color: 'var(--text-muted)', marginTop: '0.5rem'}}>Credentials are securely stored in server environment variables.</small>
+                </div>
+              </div>
             </div>
           )}
         </div>
